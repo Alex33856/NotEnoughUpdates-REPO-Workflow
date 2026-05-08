@@ -1,0 +1,30 @@
+name: build.yml
+on:
+  push:
+    branch: 'main'
+
+jobs:
+  build:
+    - name: Checkout Repository
+      uses: actions/checkout@v6
+
+    - name: Setup Node
+      uses: actions/setup-node@v6
+      with:
+        node-version: '24'
+
+    - run: npm build
+
+    - name: Commit & Push Changes
+      run: |
+        git config --global user.name "GitHub Actions"
+        git config --global user.email "github-actions@github.com"
+        git switch v1
+        git add dist/index.js
+        git add action.yml
+        if git diff-index --quiet HEAD --; then
+          echo "No changes to commit."
+          exit 0
+        fi
+        git commit -m "Update workflow"
+        git push origin HEAD:v1
